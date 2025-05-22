@@ -31,7 +31,6 @@ int main() {
         }
         address = address->ifa_next;  // Go to next interface
     }
-
     freeifaddrs(addresses);  // Free memory allocated by getifaddrs
     return 0;
 }
