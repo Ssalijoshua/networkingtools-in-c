@@ -19,6 +19,16 @@
 #include <stdio.h>
 #include <time.h>
 
+#if defined(_WIN32)
+#define ISVALID_SOCKET(s) (s != INVALID_SOCKET)
+#define CLOSE_SOCKET(s) closesocket(s)
+#define GETSOCKERRNO() WSAGETERROR()
+#else
+#define ISVALID_SOCKET(s) (s >= 0)
+#define CLOSE_SOCKET(s) close(s)
+#define GETSOCKERRNO() errno
+#endif
+
 int main(void){
     time_t timer;
     time(&timer);
