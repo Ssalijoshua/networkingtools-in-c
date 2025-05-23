@@ -22,14 +22,14 @@
 #if defined(_WIN32)
 #define ISVALID_SOCKET(s) (s != INVALID_SOCKET)
 #define CLOSE_SOCKET(s) closesocket(s)
-#define GETSOCKERRNO() WSAGETERROR()
+#define GETSOCKETERRNO() WSAGETERROR()
 #else
 #define ISVALID_SOCKET(s) (s >= 0)
 #define CLOSE_SOCKET(s) close(s)
-#define GETSOCKERRNO() errno
+#define GETSOCKETERRNO() errno
 #endif
 
-void main(void){
+int main(void){
     #if defined(_WIN32)
         WSADATA d;
     if (WSAStartup(MAKEWORD(2, 2), &d)) {
@@ -44,7 +44,16 @@ void main(void){
     hints.ai_family = AF_INET;  // IPv4
     hints.ai_socktype = SOCK_STREAM;  // TCP
     hints.ai_flags = AI_PASSIVE;  // Use wildcard IP address
-    struct addrinfo *bindaddress;
+    struct addrinfo *bind_address;
+    getaddrinfo(0, "8080", &hints, &bind_address);
 
-    getaddrinfo(0, "8080", &hints, &bindaddress);
+    printf("Creating socket...\n");
+    SOCKET socket_listen;
+    socket_listen = socket(bind_address->ai_family, bind_address->ai_socktype, bind_address->ai_protocol);
+
+    if (!ISVALID_SOCKET(socket_listen)) {
+        fprintf(stderr, "socket() failed. (%d)\n", GETSOCKETERRNO());
+        return 1;
+        }
+
 }
