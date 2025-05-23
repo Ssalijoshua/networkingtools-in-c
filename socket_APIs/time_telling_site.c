@@ -20,11 +20,11 @@
 #include <time.h>
 
 #if defined(_WIN32)
-#define ISVALID_SOCKET(s) (s != INVALID_SOCKET)
+#define ISVALIDSOCKET(s) (s != INVALID_SOCKET)
 #define CLOSE_SOCKET(s) closesocket(s)
 #define GETSOCKETERRNO() WSAGETERROR()
 #else
-#define ISVALID_SOCKET(s) (s >= 0)
+#define ISVALIDSOCKET(s) (s >= 0)
 #define CLOSE_SOCKET(s) close(s)
 #define GETSOCKETERRNO() errno
 #endif
@@ -51,9 +51,30 @@ int main(void){
     SOCKET socket_listen;
     socket_listen = socket(bind_address->ai_family, bind_address->ai_socktype, bind_address->ai_protocol);
 
-    if (!ISVALID_SOCKET(socket_listen)) {
+    if (!ISVALIDSOCKET(socket_listen)) {
         fprintf(stderr, "socket() failed. (%d)\n", GETSOCKETERRNO());
         return 1;
         }
+// Binding the socket to the local address
+    printf("Binding socket...\n");
+    if(bind(socket_listen, bind_address->ai_addr, bind_address->ai_addrlen)){
+        fprintf(stderr, "bind() failed. (%d)\n", GETSOCKETERRNO());
+        return 1;
+    }
+    freeaddrinfo(bind_address);  // Free the address info structure
 
+    printf("Listening...\n");
+    if (listen(socket_listen, 10) < 0) {
+        fprintf(stderr, "listen() failed. (%d)\n", GETSOCKETERRNO());
+    return 1;
+    }
+
+        printf("Waiting for connection...\n");
+        struct sockaddr_storage client_address;
+        socklen_t client_len = sizeof(client_address);
+        SOCKET socket_client = accept(socket_listen, (struct sockaddr*) &client_address, &client_len);
+    if (!ISVALIDSOCKET(socket_client)) {
+        fprintf(stderr, "accept() failed. (%d)\n", GETSOCKETERRNO());
+    return 1;
+    }
 }
