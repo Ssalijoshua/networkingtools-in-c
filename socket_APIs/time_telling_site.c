@@ -107,4 +107,10 @@ int main(void){
     printf("Sent %d of %d bytes.\n", bytes_sent, (int)strlen(time_string));
     printf("Closing socket...\n");
     CLOSE_SOCKET(socket_client);
+
+    #if defined(_WIN32)
+        WSACleanup();
+    #endif
+        printf("Finished.\n");
+    return 0;
 }
