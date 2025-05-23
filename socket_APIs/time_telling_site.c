@@ -29,10 +29,22 @@
 #define GETSOCKERRNO() errno
 #endif
 
-int main(void){
-    time_t timer;
-    time(&timer);
-    printf("Current time: %s", ctime(&timer));
-    return 0;
+void main(void){
+    #if defined(_WIN32)
+        WSADATA d;
+    if (WSAStartup(MAKEWORD(2, 2), &d)) {
+        fprintf(stderr, "Failed to initialize.\n");
+        return 1;
+    }
+    #endif
+    printf("Configuring local address...\n");
+    struct addrinfo hints;
+    memset(&hints, 0, sizeof(hints));
+    printf("Size of hints: %zu\n", sizeof(hints));
+    hints.ai_family = AF_INET;  // IPv4
+    hints.ai_socktype = SOCK_STREAM;  // TCP
+    hints.ai_flags = AI_PASSIVE;  // Use wildcard IP address
+    struct addrinfo *bindaddress;
 
+    getaddrinfo(0, "8080", &hints, &bindaddress);
 }
