@@ -77,4 +77,34 @@ int main(void){
         fprintf(stderr, "accept() failed. (%d)\n", GETSOCKETERRNO());
     return 1;
     }
+
+    printf("Client is connected... ");
+    char address_buffer[100];
+    getnameinfo((struct sockaddr*)&client_address, client_len, address_buffer, sizeof(address_buffer), 0, 0, NI_NUMERICHOST);
+    printf("%s\n", address_buffer);
+    
+
+    printf("Reading request...\n");
+    char request[1024];
+    int bytes_received = recv(socket_client, request, 1024, 0);
+    printf("Received %d bytes.\n", bytes_received);
+
+    printf("%.*s", bytes_received, request);
+
+    printf("Sending response...\n");
+    const char *response =
+    "HTTP/1.1 200 OK\r\n"
+    "Connection: close\r\n"
+    "Content-Type: text/plain\r\n\r\n"
+    "Local time is: ";
+    int bytes_sent = send(socket_client, response, strlen(response), 0);
+    printf("Sent %d of %d bytes.\n", bytes_sent, (int)strlen(response));
+
+    time_t timer;
+    time(&timer);
+    char *time_string = ctime(&timer);
+    bytes_sent = send(socket_client, time_string, strlen(time_string), 0);
+    printf("Sent %d of %d bytes.\n", bytes_sent, (int)strlen(time_string));
+    printf("Closing socket...\n");
+    CLOSE_SOCKET(socket_client);
 }
