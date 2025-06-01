@@ -32,4 +32,8 @@
 #if !defined(_WIN32)
 #define SOCKET int
 #endif
+ 
+int main (void){
 
+
+}
