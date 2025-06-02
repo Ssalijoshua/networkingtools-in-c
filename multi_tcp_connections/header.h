@@ -33,7 +33,3 @@
 #define SOCKET int
 #endif
  
-int main (void){
-
-
-}
